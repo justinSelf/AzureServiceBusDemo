@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiIt", "AsciiIt\AsciiIt.csproj", "{9FD30106-BB90-4BAE-A578-92B13ECBCC71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiItTests", "UnitTestProject1\AsciiItTests.csproj", "{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9FD30106-BB90-4BAE-A578-92B13ECBCC71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FD30106-BB90-4BAE-A578-92B13ECBCC71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FD30106-BB90-4BAE-A578-92B13ECBCC71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FD30106-BB90-4BAE-A578-92B13ECBCC71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

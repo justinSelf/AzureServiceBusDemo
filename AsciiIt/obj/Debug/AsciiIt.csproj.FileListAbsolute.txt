@@ -1,0 +1,6 @@
+c:\users\justin self\documents\visual studio 2013\Projects\AsciiIt\AsciiIt\bin\Debug\AsciiIt.exe.config
+c:\users\justin self\documents\visual studio 2013\Projects\AsciiIt\AsciiIt\bin\Debug\AsciiIt.exe
+c:\users\justin self\documents\visual studio 2013\Projects\AsciiIt\AsciiIt\bin\Debug\AsciiIt.pdb
+c:\users\justin self\documents\visual studio 2013\Projects\AsciiIt\AsciiIt\obj\Debug\AsciiIt.csprojResolveAssemblyReference.cache
+c:\users\justin self\documents\visual studio 2013\Projects\AsciiIt\AsciiIt\obj\Debug\AsciiIt.exe
+c:\users\justin self\documents\visual studio 2013\Projects\AsciiIt\AsciiIt\obj\Debug\AsciiIt.pdb
