@@ -15,7 +15,7 @@ namespace AsciiIt
             var grayscales = GenerateGrayscaleMap();
             var normalizedGrayscales = NormalizeGrayscales(grayscales);
 
-            var image = new Bitmap("test.jpeg");
+            var image = new Bitmap("cat.jpeg");
 
             int minGray;
             int maxGray;
