@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiIt", "AsciiIt\AsciiIt.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiItTests", "UnitTestProject1\AsciiItTests.csproj", "{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiIt.Web", "AsciiIt.Web\AsciiIt.Web.csproj", "{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2BE34F4-36E9-4006-BED9-AF10B54BEBF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
