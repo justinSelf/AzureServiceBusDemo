@@ -8,40 +8,77 @@ using System.Drawing;
 
 namespace AsciiIt
 {
-    class Program
+    public class ImageCoverterService
     {
-        static void Main(string[] args)
+        private List<KeyValuePair<int, char>> NormalizeGrayscales(SortedDictionary<int, char> grayscales)
         {
-            var grayscales = GenerateGrayscaleMap();
-            var normalizedGrayscales = NormalizeGrayscales(grayscales);
+            var max = grayscales.Aggregate(int.MinValue, (memo, pair) => memo < pair.Key ? pair.Key : memo);
+            var min = grayscales.Aggregate(int.MaxValue, (memo, pair) => memo > pair.Key ? pair.Key : memo);
 
-            var image = new Bitmap("cat.jpeg");
+            var range = max - min;
 
-            int minGray;
-            int maxGray;
-
-            var grayscaleMatrix = GenerateGrayscaleMatrix(image, out maxGray, out minGray);
-
-            var sb = new StringBuilder(256);
-            sb.Append("<pre>");
-            for (int j = 0; j < (image.Height); j++)
+            Func<KeyValuePair<int, char>, KeyValuePair<int, char>> normalizePair = (pair) =>
             {
-                for (int i = 0; i < image.Width; i++)
+                var newKey = 1 + (pair.Key - min) * 255 / range;
+                return new KeyValuePair<int, char>(newKey, pair.Value);
+            };
+
+            var normalizedGrayscales = grayscales.Select(normalizePair).ToList();
+            return normalizedGrayscales;
+        }
+        private List<KeyValuePair<int, char>> GenerateGrayscaleMap()
+        {
+            var grayscales = new SortedDictionary<int, char>();
+
+            for (int i = 33; i < 126; i++)
+            {
+                var characterImage = CreateImageFromCharacter((char)i);
+
+                var grayscale = 0;
+
+                for (int width = 0; width < characterImage.Width; width++)
                 {
-                    var normalizedValue = 1 + (grayscaleMatrix[i, j] - minGray) * 255 / (maxGray - minGray);
-                    var replaceCharacter = normalizedGrayscales.First(pair => pair.Key >= normalizedValue).Value;
-
-                    sb.Append(replaceCharacter);
+                    for (int height = 0; height < characterImage.Height; height++)
+                    {
+                        var pixel = (characterImage as Bitmap).GetPixel(width, height);
+                        grayscale += (int)((pixel.R * .3) + (pixel.G * .59) + (pixel.B * .11));
+                    }
                 }
-                sb.AppendLine();
+
+                grayscale = grayscale / (characterImage.Width * characterImage.Height);
+                if (!grayscales.ContainsKey(grayscale)) grayscales.Add(grayscale, (char)i);
             }
+            return NormalizeGrayscales(grayscales);
+        }
 
-            sb.Append(@"</pre>");
+        /// <summary>
+        /// This method is shamelessly lifted from this stackoverflow answer: http://stackoverflow.com/a/2070493/899048
+        /// </summary>
+        private static Image CreateImageFromCharacter(char character)
+        {
+            var font = new Font(FontFamily.GenericMonospace, 10);
+            var text = character.ToString();
+            var textColor = Color.Black;
+            var backColor = Color.White;
+            Image img = new Bitmap(1, 1);
+            Graphics drawing = Graphics.FromImage(img);
+            SizeF textSize = drawing.MeasureString(text, font);
 
-            var file = File.CreateText("test.html");
+            img.Dispose();
+            drawing.Dispose();
 
-            file.Write(sb.ToString());
+            img = new Bitmap((int)textSize.Width, (int)textSize.Height);
+            drawing = Graphics.FromImage(img);
+            drawing.Clear(backColor);
 
+            Brush textBrush = new SolidBrush(textColor);
+            drawing.DrawString(text, font, textBrush, 0, 0);
+
+            drawing.Save();
+            textBrush.Dispose();
+            drawing.Dispose();
+
+            return img;
         }
 
         private static int[,] GenerateGrayscaleMatrix(Bitmap image, out int maxGray, out int minGray)
@@ -67,85 +104,31 @@ namespace AsciiIt
             return grayscaleMatrix;
         }
 
-        private static List<KeyValuePair<int, char>> NormalizeGrayscales(SortedDictionary<int, char> grayscales)
+        public string ConvertImage(Bitmap image)
         {
-            var max = grayscales.Aggregate(int.MinValue, (memo, pair) => memo < pair.Key ? pair.Key : memo);
-            var min = grayscales.Aggregate(int.MaxValue, (memo, pair) => memo > pair.Key ? pair.Key : memo);
+            int minGray;
+            int maxGray;
 
-            var range = max - min;
+            var grayscaleMatrix = GenerateGrayscaleMatrix(image, out maxGray, out minGray);
+            var normalizedGrayscales = GenerateGrayscaleMap();
 
-            Func<KeyValuePair<int, char>, KeyValuePair<int, char>> normalizePair = (pair) =>
+            var sb = new StringBuilder(256);
+            sb.Append("<pre>");
+            for (int j = 0; j < (image.Height); j++)
             {
-                var newKey = 1 + (pair.Key - min) * 255 / range;
-                return new KeyValuePair<int, char>(newKey, pair.Value);
-            };
-
-            var normalizedGrayscales = grayscales.Select(normalizePair).ToList();
-            return normalizedGrayscales;
-        }
-
-        private static SortedDictionary<int, char> GenerateGrayscaleMap()
-        {
-            var grayscales = new SortedDictionary<int, char>();
-
-            for (int i = 33; i < 126; i++)
-            {
-                var characterImage = DrawText(((char)i).ToString(), new Font(FontFamily.GenericMonospace, 10), Color.Black,
-                    Color.White);
-
-                var grayscale = 0;
-
-                for (int width = 0; width < characterImage.Width; width++)
+                for (int i = 0; i < image.Width; i++)
                 {
-                    for (int height = 0; height < characterImage.Height; height++)
-                    {
-                        var pixel = (characterImage as Bitmap).GetPixel(width, height);
-                        grayscale += (int)((pixel.R * .3) + (pixel.G * .59) + (pixel.B * .11));
-                    }
+                    var normalizedValue = 1 + (grayscaleMatrix[i, j] - minGray) * 255 / (maxGray - minGray);
+                    var replaceCharacter = normalizedGrayscales.First(pair => pair.Key >= normalizedValue).Value;
+
+                    sb.Append(replaceCharacter);
                 }
-
-                grayscale = grayscale / (characterImage.Width * characterImage.Height);
-                if (!grayscales.ContainsKey(grayscale)) grayscales.Add(grayscale, (char)i);
+                sb.AppendLine();
             }
-            return grayscales;
-        }
 
-        /// <summary>
-        /// This method is shamelessly lifted from this stackoverflow answer: http://stackoverflow.com/a/2070493/899048
-        /// </summary>
-        private static Image DrawText(String text, Font font, Color textColor, Color backColor)
-        {
-            //first, create a dummy bitmap just to get a graphics object
-            Image img = new Bitmap(1, 1);
-            Graphics drawing = Graphics.FromImage(img);
+            sb.Append(@"</pre>");
 
-            //measure the string to see how big the image needs to be
-            SizeF textSize = drawing.MeasureString(text, font);
-
-            //free up the dummy image and old graphics object
-            img.Dispose();
-            drawing.Dispose();
-
-            //create a new image of the right size
-            img = new Bitmap((int)textSize.Width, (int)textSize.Height);
-             
-            drawing = Graphics.FromImage(img);
-
-            //paint the background
-            drawing.Clear(backColor);
-
-            //create a brush for the text
-            Brush textBrush = new SolidBrush(textColor);
-
-            drawing.DrawString(text, font, textBrush, 0, 0);
-
-            drawing.Save();
-
-            textBrush.Dispose();
-            drawing.Dispose();
-
-            return img;
-
+            return sb.ToString();
         }
     }
 }

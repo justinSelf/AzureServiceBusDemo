@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System;
+using System.Web;
 using System.Web.Mvc;
 
 namespace AsciiIt.Web.Controllers
@@ -10,9 +11,10 @@ namespace AsciiIt.Web.Controllers
             return View();
         }
 
-        public JsonResult Index(HttpPostedFile image)
+        [HttpPost]
+        public FileResult Index(HttpPostedFileBase image)
         {
-            return Json("Success");
+            return new FileStreamResult(image.InputStream, image.ContentType);
         }
     }
 }
