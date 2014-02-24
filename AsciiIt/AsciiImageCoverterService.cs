@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace AsciiIt
 {
-    public class ImageCoverterService
+    public class AsciiImageCoverterService
     {
         private List<KeyValuePair<int, char>> NormalizeGrayscales(SortedDictionary<int, char> grayscales)
         {
