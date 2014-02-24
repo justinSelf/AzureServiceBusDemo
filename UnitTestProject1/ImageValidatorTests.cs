@@ -9,7 +9,7 @@ using Rhino.Mocks;
 namespace AsciiItTests
 {
     [TestClass]
-    public class ImageValidatorTests
+    public class ImageconverterTests
     {
         private static FileStream imageStream;
         private static Stream textStream;
@@ -29,7 +29,6 @@ namespace AsciiItTests
         public void TestCleanup()
         {
             if (imageStream != null) imageStream.Dispose();
-
             if (textStream != null) textStream.Dispose();
         }
 
@@ -62,11 +61,11 @@ namespace AsciiItTests
         public void FileWithoutImageExtensionShouldReturnNull()
         {
             //Arrange
-            var validator = new ImageStreamConverter();
+            var converter = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFile("someFile.txt");
 
             //Act
-            var result = validator.GetBitmapFromPostedFile(httpFileStub);
+            var result = converter.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
             Assert.IsNull(result);
@@ -77,12 +76,12 @@ namespace AsciiItTests
         public void FileNameWithoutImageExtensionAndLotsOfPeriodsShouldNotBeValidAndReturnNull()
         {
             //Arrange
-            var validator = new ImageStreamConverter();
+            var converter = new ImageStreamConverter();
 
             var httpFileStub = GetStubbedPostedFile("some.File.that.isnt.an.image.txt");
 
             //Act
-            var result = validator.GetBitmapFromPostedFile(httpFileStub);
+            var result = converter.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
             Assert.IsNull(result);
@@ -93,11 +92,11 @@ namespace AsciiItTests
         public void FileNameWithImageExtensionShouldNotReturnNull()
         {
             //Arrange
-            var validator = new ImageStreamConverter();
+            var converter = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFileWithImage("someImage.jpg");
 
             //Act
-            var result = validator.GetBitmapFromPostedFile(httpFileStub);
+            var result = converter.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
             Assert.IsNotNull(result);
@@ -107,11 +106,11 @@ namespace AsciiItTests
         public void FileNameWithImageExtensionAndLotsOfPeriodsShouldNotReturnNull()
         {
             //Arrange
-            var validator = new ImageStreamConverter();
+            var converter = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFileWithImage("some.Image.that.will.be.converted.jpg");
 
             //Act
-            var result = validator.GetBitmapFromPostedFile(httpFileStub);
+            var result = converter.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
             Assert.IsNotNull(result);
@@ -121,11 +120,11 @@ namespace AsciiItTests
         public void TextFileWithImageExtensionShouldReturnNull()
         {
             //Arrange
-            var validator = new ImageStreamConverter();
+            var converter = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFileWithTextFile("notanImage.jpg");
 
             //Act
-            var result = validator.GetBitmapFromPostedFile(httpFileStub);
+            var result = converter.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
             Assert.IsNull(result);

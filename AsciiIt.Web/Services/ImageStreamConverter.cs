@@ -22,10 +22,9 @@ namespace AsciiIt.Web.Services
         {
             if (!FileHasImageExtension(postedFile.FileName)) return null;
 
-            Bitmap image = null;
             try
             {
-                image = new Bitmap(postedFile.InputStream);
+                var image = new Bitmap(postedFile.InputStream);
                 return image;
             }
             catch (ArgumentException)
