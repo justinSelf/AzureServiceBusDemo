@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Web;
@@ -24,16 +25,21 @@ namespace AsciiIt.Web.Controllers
 
             var asciiService = new AsciiImageCoverterService();
 
+            var stream = GetAsciiArtStream(asciiService, bitmap);
+            var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
+
+            Response.AddHeader("Content-Disposition", headerValue);
+
+            return new FileStreamResult(stream, "application/text");
+        }
+
+        private static MemoryStream GetAsciiArtStream(AsciiImageCoverterService asciiService, Bitmap bitmap)
+        {
             var convertedAsciiArt = asciiService.ConvertImage(bitmap);
 
             byte[] asciiArtBytes = Encoding.UTF8.GetBytes(convertedAsciiArt);
             var stream = new MemoryStream(asciiArtBytes);
-
-            var convertedName = image.FileName + "_converted.txt";
-
-            Response.AddHeader("Content-Disposition", string.Format("attachment; filename={0}", convertedName));
-
-            return new FileStreamResult(stream, "application/text");
+            return stream;
         }
     }
 }
