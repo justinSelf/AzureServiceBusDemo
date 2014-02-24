@@ -113,7 +113,6 @@ namespace AsciiIt
             var normalizedGrayscales = GenerateGrayscaleMap();
 
             var sb = new StringBuilder(256);
-            sb.Append("<pre>");
             for (int j = 0; j < (image.Height); j++)
             {
                 for (int i = 0; i < image.Width; i++)
@@ -125,9 +124,6 @@ namespace AsciiIt
                 }
                 sb.AppendLine();
             }
-
-            sb.Append(@"</pre>");
-
             return sb.ToString();
         }
     }
