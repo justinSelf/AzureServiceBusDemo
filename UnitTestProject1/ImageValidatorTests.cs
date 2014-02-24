@@ -1,4 +1,7 @@
-﻿using System.Web;
+﻿using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Web;
 using AsciiIt.Web.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
@@ -8,74 +11,124 @@ namespace AsciiItTests
     [TestClass]
     public class ImageValidatorTests
     {
+        private static FileStream imageStream;
+        private static Stream textStream;
+
+        [TestInitialize]
+        public void TestSetup()
+        {
+            imageStream = new FileStream("Resources\\test.jpeg", FileMode.Open);
+
+            var data = "some random text";
+            byte[] buffer = Encoding.UTF8.GetBytes(data);
+            textStream = new MemoryStream(buffer);
+
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            if (imageStream != null) imageStream.Dispose();
+
+            if (textStream != null) textStream.Dispose();
+        }
+
+        private HttpPostedFileBase GetStubbedPostedFile(string fileName)
+        {
+            var httpFileStub = MockRepository.GenerateStub<HttpPostedFileBase>();
+            httpFileStub.Stub(stub => stub.FileName).Return(fileName);
+
+            return httpFileStub;
+        }
+
+        private HttpPostedFileBase GetStubbedPostedFileWithImage(string fileName)
+        {
+            var httpFileStub = GetStubbedPostedFile(fileName);
+            httpFileStub.Stub(stub => stub.InputStream).Return(imageStream);
+
+            return httpFileStub;
+        }
+
+
+        private HttpPostedFileBase GetStubbedPostedFileWithTextFile(string fileName)
+        {
+            var httpFileStub = GetStubbedPostedFile(fileName);
+            httpFileStub.Stub(s => s.InputStream).Return(textStream);
+
+            return httpFileStub;
+        }
+
         [TestMethod]
-        public void FileWithoutImageExtensionShouldNotBeValid()
+        public void FileWithoutImageExtensionShouldReturnNull()
         {
             //Arrange
             var validator = new ImageValidator();
-
-            var httpFileStub = MockRepository.GenerateStub<HttpPostedFileBase>();
-            httpFileStub.Stub(stub => stub.FileName).Return("someFile.txt");
+            var httpFileStub = GetStubbedPostedFile("someFile.txt");
 
             //Act
-
-            var result = validator.IsValidPostedImage(httpFileStub);
+            var result = validator.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
-            Assert.IsFalse(result);
+            Assert.IsNull(result);
 
         }
 
         [TestMethod]
-        public void FileWithoutImageExtensionAndLotsOfPeriodsShouldNotBeValid()
+        public void FileNameWithoutImageExtensionAndLotsOfPeriodsShouldNotBeValidAndReturnNull()
         {
             //Arrange
             var validator = new ImageValidator();
 
-            var httpFileStub = MockRepository.GenerateStub<HttpPostedFileBase>();
-            httpFileStub.Stub(stub => stub.FileName).Return("some.File.that.isnt.an.image.txt");
+            var httpFileStub = GetStubbedPostedFile("some.File.that.isnt.an.image.txt");
 
             //Act
-
-            var result = validator.IsValidPostedImage(httpFileStub);
+            var result = validator.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
-            Assert.IsFalse(result);
+            Assert.IsNull(result);
 
         }
 
         [TestMethod]
-        public void FileWithImageExtensionShouldBeValid()
+        public void FileNameWithImageExtensionShouldNotReturnNull()
         {
             //Arrange
             var validator = new ImageValidator();
-
-            var httpFileStub = MockRepository.GenerateStub<HttpPostedFileBase>();
-            httpFileStub.Stub(stub => stub.FileName).Return("someImage.jpg");
+            var httpFileStub = GetStubbedPostedFileWithImage("someImage.jpg");
 
             //Act
-
-            var result = validator.IsValidPostedImage(httpFileStub);
+            var result = validator.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
-            Assert.IsTrue(result);
+            Assert.IsNotNull(result);
         }
 
         [TestMethod]
-        public void FileWithImageExtensionAndLotsOfPeriodsShouldBeValid()
+        public void FileNameWithImageExtensionAndLotsOfPeriodsShouldNotReturnNull()
         {
             //Arrange
             var validator = new ImageValidator();
-
-            var httpFileStub = MockRepository.GenerateStub<HttpPostedFileBase>();
-            httpFileStub.Stub(stub => stub.FileName).Return("some.Image.that.will.be.converted.jpg");
+            var httpFileStub = GetStubbedPostedFileWithImage("some.Image.that.will.be.converted.jpg");
 
             //Act
-
-            var result = validator.IsValidPostedImage(httpFileStub);
+            var result = validator.GetBitmapFromPostedFile(httpFileStub);
 
             //Assert
-            Assert.IsTrue(result);
+            Assert.IsNotNull(result);
+        }
+
+        [TestMethod]
+        public void TextFileWithImageExtensionShouldReturnNull()
+        {
+            //Arrange
+            var validator = new ImageValidator();
+            var httpFileStub = GetStubbedPostedFileWithTextFile("notanImage.jpg");
+
+            //Act
+            var result = validator.GetBitmapFromPostedFile(httpFileStub);
+
+            //Assert
+            Assert.IsNull(result);
         }
     }
 }

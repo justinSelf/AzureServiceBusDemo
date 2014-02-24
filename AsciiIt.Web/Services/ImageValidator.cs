@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Web;
 
 namespace AsciiIt.Web.Services
@@ -8,13 +9,30 @@ namespace AsciiIt.Web.Services
     public class ImageValidator
     {
         private readonly List<string> imageExtensions = new List<string> { "jpeg", "jpg", "bmp", "png" };
-        public bool IsValidPostedImage(HttpPostedFileBase postedFile)
+        private bool FileHasImageExtension(string postedFileName)
         {
-            var splitFileName = postedFile.FileName.Split('.');
+            var splitFileName = postedFileName.Split('.');
 
             var extension = splitFileName[splitFileName.Length - 1];
 
             return imageExtensions.Contains(extension);
+        }
+
+        public Bitmap GetBitmapFromPostedFile(HttpPostedFileBase postedFile)
+        {
+            if (!FileHasImageExtension(postedFile.FileName)) return null;
+
+            Bitmap image = null;
+            try
+            {
+                image = new Bitmap(postedFile.InputStream);
+                return image;
+            }
+            catch (ArgumentException)
+            {
+                return null;
+            }
+
         }
     }
 }
