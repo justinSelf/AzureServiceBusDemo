@@ -164,7 +164,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\ImageValidator.cs" />
+    <Compile Include="Services\ImageStreamConverter.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

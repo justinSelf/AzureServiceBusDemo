@@ -6,7 +6,7 @@ using System.Web;
 
 namespace AsciiIt.Web.Services
 {
-    public class ImageValidator
+    public class ImageStreamConverter
     {
         private readonly List<string> imageExtensions = new List<string> { "jpeg", "jpg", "bmp", "png" };
         private bool FileHasImageExtension(string postedFileName)

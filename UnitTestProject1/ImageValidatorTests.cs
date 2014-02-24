@@ -62,7 +62,7 @@ namespace AsciiItTests
         public void FileWithoutImageExtensionShouldReturnNull()
         {
             //Arrange
-            var validator = new ImageValidator();
+            var validator = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFile("someFile.txt");
 
             //Act
@@ -77,7 +77,7 @@ namespace AsciiItTests
         public void FileNameWithoutImageExtensionAndLotsOfPeriodsShouldNotBeValidAndReturnNull()
         {
             //Arrange
-            var validator = new ImageValidator();
+            var validator = new ImageStreamConverter();
 
             var httpFileStub = GetStubbedPostedFile("some.File.that.isnt.an.image.txt");
 
@@ -93,7 +93,7 @@ namespace AsciiItTests
         public void FileNameWithImageExtensionShouldNotReturnNull()
         {
             //Arrange
-            var validator = new ImageValidator();
+            var validator = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFileWithImage("someImage.jpg");
 
             //Act
@@ -107,7 +107,7 @@ namespace AsciiItTests
         public void FileNameWithImageExtensionAndLotsOfPeriodsShouldNotReturnNull()
         {
             //Arrange
-            var validator = new ImageValidator();
+            var validator = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFileWithImage("some.Image.that.will.be.converted.jpg");
 
             //Act
@@ -121,7 +121,7 @@ namespace AsciiItTests
         public void TextFileWithImageExtensionShouldReturnNull()
         {
             //Arrange
-            var validator = new ImageValidator();
+            var validator = new ImageStreamConverter();
             var httpFileStub = GetStubbedPostedFileWithTextFile("notanImage.jpg");
 
             //Act
