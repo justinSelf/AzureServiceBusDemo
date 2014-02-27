@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using AsciiIt.Web.Services;
 
 namespace AsciiIt.Web.Controllers
 {
@@ -13,18 +17,32 @@ namespace AsciiIt.Web.Controllers
             return View();
         }
 
-        public ActionResult About()
+        [HttpPost]
+        public ActionResult Index(HttpPostedFileBase image)
         {
-            ViewBag.Message = "Your application description page.";
+            if (image == null) return Index();
+            var imageStreamConverter = new ImageStreamConverter();
+            var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
 
-            return View();
+            if (bitmap == null) return Index();
+
+            var asciiService = new AsciiImageCoverterService();
+
+            var stream = GetAsciiArtStream(asciiService, bitmap);
+            var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
+
+            Response.AddHeader("Content-Disposition", headerValue);
+
+            return new FileStreamResult(stream, "application/text");
         }
 
-        public ActionResult Contact()
+        private static MemoryStream GetAsciiArtStream(AsciiImageCoverterService asciiService, Bitmap bitmap)
         {
-            ViewBag.Message = "Your contact page.";
+            var convertedAsciiArt = asciiService.ConvertImage(bitmap);
 
-            return View();
+            byte[] asciiArtBytes = Encoding.UTF8.GetBytes(convertedAsciiArt);
+            var stream = new MemoryStream(asciiArtBytes);
+            return stream;
         }
     }
 }
