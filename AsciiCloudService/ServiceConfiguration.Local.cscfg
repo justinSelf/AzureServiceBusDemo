@@ -4,6 +4,7 @@
     <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.ServiceBus.ConnectionString" value="Endpoint=sb://asciiit.servicebus.windows.net/;SharedSecretIssuer=owner;SharedSecretValue=LhqVvjg43heXR27ZtuuvW3c881tZLr6UblAQtnUNdd8=" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

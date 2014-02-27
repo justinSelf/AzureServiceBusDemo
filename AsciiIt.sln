@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiItTests", "UnitTestPro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiIt.Web", "AsciiIt.Web\AsciiIt.Web.csproj", "{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}"
 EndProject
+Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "AsciiCloudService", "AsciiCloudService\AsciiCloudService.ccproj", "{E1B16649-1A83-42F8-BB49-C5B0B5B6B1C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsciiQueueProcessor", "AsciiQueueProcessor\AsciiQueueProcessor.csproj", "{D4FECEC5-0BA4-4D43-A1CA-0D3FEF51833D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D13AF3B1-5C71-4C03-9D32-FAF2D3F3BDFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1B16649-1A83-42F8-BB49-C5B0B5B6B1C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1B16649-1A83-42F8-BB49-C5B0B5B6B1C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1B16649-1A83-42F8-BB49-C5B0B5B6B1C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1B16649-1A83-42F8-BB49-C5B0B5B6B1C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4FECEC5-0BA4-4D43-A1CA-0D3FEF51833D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4FECEC5-0BA4-4D43-A1CA-0D3FEF51833D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4FECEC5-0BA4-4D43-A1CA-0D3FEF51833D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4FECEC5-0BA4-4D43-A1CA-0D3FEF51833D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

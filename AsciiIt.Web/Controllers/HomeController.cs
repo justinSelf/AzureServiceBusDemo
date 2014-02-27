@@ -6,34 +6,52 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using AsciiIt.Web.Models;
 using AsciiIt.Web.Services;
+using Microsoft.ServiceBus;
+using Microsoft.ServiceBus.Messaging;
+using Microsoft.WindowsAzure;
 
 namespace AsciiIt.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(string message = "")
         {
-            return View();
+            return View(new MessageModel { Message = message });
         }
 
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase image)
         {
-            if (image == null) return Index();
-            var imageStreamConverter = new ImageStreamConverter();
-            var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
+            string connectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
 
-            if (bitmap == null) return Index();
+            var namespaceManager = NamespaceManager.CreateFromConnectionString(connectionString);
 
-            var asciiService = new AsciiImageCoverterService();
+            if (!namespaceManager.QueueExists("ImageProcessing"))
+            {
+                namespaceManager.CreateQueue("ImageProcessing");
+            }
 
-            var stream = GetAsciiArtStream(asciiService, bitmap);
-            var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
+            var client = QueueClient.CreateFromConnectionString(connectionString, "ImageProcessing");
 
-            Response.AddHeader("Content-Disposition", headerValue);
+            client.Send(new BrokeredMessage());
 
-            return new FileStreamResult(stream, "application/text");
+            //if (image == null) return Index("Where's the beef?");
+            //var imageStreamConverter = new ImageStreamConverter();
+            //var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
+
+            //if (bitmap == null) return Index("That's not an image, homie...");
+
+            //var asciiService = new AsciiImageCoverterService();
+
+            //var stream = GetAsciiArtStream(asciiService, bitmap);
+            //var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
+
+            //Response.AddHeader("Content-Disposition", headerValue);
+
+            //return new FileStreamResult(stream, "application/text");
+            return Index();
         }
 
         private static MemoryStream GetAsciiArtStream(AsciiImageCoverterService asciiService, Bitmap bitmap)

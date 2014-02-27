@@ -1,9 +1,16 @@
-﻿@{
+﻿@model AsciiIt.Web.Models.MessageModel
+@{
     ViewBag.Title = "Home Page";
 }
 
 <div class="jumbotron">
     <h2>Make It Ascii!</h2>
+    @{
+        if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <h3>@Model.Message</h3>
+        }
+    }
 </div>
 <div class="row">
     <div class="col-md-12">
