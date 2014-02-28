@@ -1,20 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
+using System.IO;
 using System.Linq;
+using AsciiIt;
+using AsciiIt.Contracts;
 using System.Net;
 using System.Threading;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using Microsoft.WindowsAzure.Storage;
 
 namespace AsciiQueueProcessor
 {
     public class WorkerRole : RoleEntryPoint
     {
         // The name of your queue
-        const string QueueName = "ProcessingQueue";
+        const string QueueName = "imageprocessing";
 
         // QueueClient is thread-safe. Recommended that you cache 
         // rather than recreating it on every request
@@ -30,6 +35,24 @@ namespace AsciiQueueProcessor
                 {
                     try
                     {
+                        var imageMessage = receivedMessage.GetBody<ImageMessage>();
+
+                        var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
+                        var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+
+                        var blobClient = storageAccount.CreateCloudBlobClient();
+                        var container = blobClient.GetContainerReference("images");
+                        var blobBlock = container.GetBlockBlobReference(imageMessage.BlobBlockName);
+
+                        var stream = new MemoryStream();
+                        blobBlock.DownloadToStream(stream);
+                        stream.Position = 0;
+                        var bitmap = (Bitmap)Image.FromStream(stream);
+                        
+                        var converterService = new AsciiImageCoverterService();
+
+                        string result = converterService.ConvertImage(bitmap);
+
                         // Process the message
                         Trace.WriteLine("Processing Service Bus message: " + receivedMessage.SequenceNumber.ToString());
                     }
