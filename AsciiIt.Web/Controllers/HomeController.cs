@@ -29,24 +29,22 @@ namespace AsciiIt.Web.Controllers
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase image)
         {
-            var serviceBusConnectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
-            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
-
-            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("images");
-
-            container.CreateIfNotExists();
-
             if (image == null) return Index("Where's the beef?");
             var imageStreamConverter = new ImageStreamConverter();
             var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
 
             if (bitmap == null) return Index("That's not an image, homie...");
 
-            var blockReference = container.GetBlockBlobReference(Guid.NewGuid().ToString());
 
+            var serviceBusConnectionString = CloudConfigurationManager.GetSetting("Microsoft.ServiceBus.ConnectionString");
+            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
 
+            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("images");
+            container.CreateIfNotExists();
+
+            var blockReference = container.GetBlockBlobReference(image.FileName);
             var converter = new ImageConverter();
             var bitmapBytes = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
 
@@ -63,16 +61,26 @@ namespace AsciiIt.Web.Controllers
             var message = new BrokeredMessage(new ImageMessage { BlobBlockName = blockReference.Name });
 
             client.Send(message);
-
-            //var asciiService = new AsciiImageCoverterService();
-
-            //var stream = GetAsciiArtStream(asciiService, bitmap);
-            //var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
-
-            //Response.AddHeader("Content-Disposition", headerValue);
-
-            //return new FileStreamResult(stream, "application/text");
             return Index();
+        }
+
+        public ActionResult Gallery()
+        {
+            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
+
+            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("converted-images");
+            container.CreateIfNotExists();
+
+            var convertedImageBlobs = container.ListBlobs();
+
+            return View(convertedImageBlobs);
+        }
+
+        public ActionResult ConvertedImage(string name)
+        {
+            return null;
         }
 
         private static MemoryStream GetAsciiArtStream(AsciiImageCoverterService asciiService, Bitmap bitmap)

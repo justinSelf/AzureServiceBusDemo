@@ -1,0 +1,30 @@
+﻿@using Microsoft.WindowsAzure.Storage.Blob
+@using Microsoft.WindowsAzure.Storage.Blob.Protocol
+@model IEnumerable<Microsoft.WindowsAzure.Storage.Blob.IListBlobItem>
+
+@{
+    var blobNames = Model.Select<IListBlobItem, string>(blob =>
+    {
+        var splitUri = blob.Uri.AbsolutePath.Split('/');
+        var blobName = splitUri[splitUri.Length - 1];
+        return blobName;
+    });
+
+}
+
+<table>
+    <thead>
+        <tr>
+            <td>Converted Image</td>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            foreach (var blobName in blobNames)
+            {
+                <tr><td>@blobName</td></tr>
+            }
+        }
+        <tr></tr>
+    </tbody>
+</table>
