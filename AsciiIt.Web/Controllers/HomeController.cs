@@ -18,23 +18,19 @@ namespace AsciiIt.Web.Controllers
     {
         private const string CONVERTED_CONTAINER = "converted-images";
 
-        public ActionResult Index()
+        public ActionResult Index(string message = "")
         {
-            return View();
+            return View((object)message);
         }
 
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase image)
         {
-            if (image == null) return Index();
+            if (image == null) return Index("Where's the beef?");
             var imageStreamConverter = new ImageStreamConverter();
             var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
 
-            if (bitmap == null) return Index();
-
-            var asciiService = new AsciiImageCoverterService();
-
-            var stream = GetAsciiArtStream(asciiService, bitmap);
+            if (bitmap == null) return Index("That's not an image, homie...");
 
             var container = GetBlobContainer(CONVERTED_CONTAINER);
 
@@ -43,19 +39,14 @@ namespace AsciiIt.Web.Controllers
             {
                 return View((object)"An image with this name already exists in the gallery. Please choose a unique name");
             }
+
+            var asciiService = new AsciiImageCoverterService();
+
+            var stream = GetAsciiArtStream(asciiService, bitmap);
+
             blob.UploadFromStream(stream);
 
             return Index();
-        }
-
-        public JsonResult Status(string imageName)
-        {
-            var container = GetBlobContainer(CONVERTED_CONTAINER);
-            if (container.GetBlobReferenceFromServer(imageName).Exists())
-            {
-                return Json(true, JsonRequestBehavior.AllowGet);
-            }
-            return Json(false, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Gallery()
