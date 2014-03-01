@@ -48,15 +48,19 @@ namespace AsciiQueueProcessor
                         blobBlock.DownloadToStream(stream);
                         stream.Position = 0;
                         var bitmap = (Bitmap)Image.FromStream(stream);
-                        
+
                         var converterService = new AsciiImageCoverterService();
 
                         string result = converterService.ConvertImage(bitmap);
 
+                        var convertedContainer = blobClient.GetContainerReference("converted-images");
+                        convertedContainer.CreateIfNotExists();
+                        convertedContainer.GetBlockBlobReference(imageMessage.BlobBlockName).UploadText(result);
+                        
                         // Process the message
                         Trace.WriteLine("Processing Service Bus message: " + receivedMessage.SequenceNumber.ToString());
                     }
-                    catch
+                    catch(Exception ex)
                     {
                         // Handle any message processing specific exceptions here
                     }
