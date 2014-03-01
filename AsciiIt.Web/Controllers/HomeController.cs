@@ -32,11 +32,19 @@ namespace AsciiIt.Web.Controllers
             var asciiService = new AsciiImageCoverterService();
 
             var stream = GetAsciiArtStream(asciiService, bitmap);
-            var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
 
-            Response.AddHeader("Content-Disposition", headerValue);
+            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
 
-            return new FileStreamResult(stream, "application/text");
+            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("converted-images");
+            container.CreateIfNotExists();
+
+            var blob = container.GetBlockBlobReference(image.FileName);
+
+            blob.UploadFromStream(stream);
+
+            return Index();
         }
 
 
