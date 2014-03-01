@@ -55,17 +55,12 @@ namespace AsciiIt.Web.Controllers
             {
                 return Json(true, JsonRequestBehavior.AllowGet);
             }
-            else
-            {
-                return Json(false, JsonRequestBehavior.AllowGet);
-            }
-
+            return Json(false, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Gallery()
         {
             var container = GetBlobContainer(CONVERTED_CONTAINER);
-
             var convertedImageBlobs = container.ListBlobs();
 
             return View(convertedImageBlobs);
