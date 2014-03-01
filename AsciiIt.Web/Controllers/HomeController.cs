@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.ServiceModel.Channels;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using AsciiIt.Contracts;
 using AsciiIt.Web.Models;
 using AsciiIt.Web.Services;
-using Microsoft.Ajax.Utilities;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
 using Microsoft.WindowsAzure;
@@ -21,6 +16,9 @@ namespace AsciiIt.Web.Controllers
 {
     public class HomeController : Controller
     {
+        private const string CONVERTED_IMAGES_CONTAINER = "converted-images";
+        private const string IMAGES_CONTAINER = "images";
+
         public ActionResult Index(string message = "")
         {
             return View(new MessageModel { Message = message });
@@ -41,7 +39,7 @@ namespace AsciiIt.Web.Controllers
 
             var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("images");
+            var container = blobClient.GetContainerReference(IMAGES_CONTAINER);
             container.CreateIfNotExists();
 
             var blockReference = container.GetBlockBlobReference(image.FileName);
@@ -66,27 +64,25 @@ namespace AsciiIt.Web.Controllers
 
         public ActionResult Gallery()
         {
-            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
-
-            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
-            var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("converted-images");
-            container.CreateIfNotExists();
+            var container = GetBlobContainer(CONVERTED_IMAGES_CONTAINER);
 
             var convertedImageBlobs = container.ListBlobs();
 
             return View(convertedImageBlobs);
         }
 
-        public ActionResult ConvertedImage(string name)
+        private static CloudBlobContainer GetBlobContainer(string containerName)
         {
             var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
-
             var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("converted-images");
-            container.CreateIfNotExists();
+            var container = blobClient.GetContainerReference(containerName);
+            return container;
+        }
 
+        public ActionResult ConvertedImage(string name)
+        {
+            var container = GetBlobContainer(CONVERTED_IMAGES_CONTAINER);
             var blob = container.GetBlockBlobReference(name);
             var asciiImage = blob.DownloadText();
 
