@@ -80,7 +80,19 @@ namespace AsciiIt.Web.Controllers
 
         public ActionResult ConvertedImage(string name)
         {
-            return null;
+            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
+
+            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference("converted-images");
+            container.CreateIfNotExists();
+
+            var blob = container.GetBlockBlobReference(name);
+            var asciiImage = blob.DownloadText();
+
+            var model = new AsciiImage { ImageText = asciiImage, Name = name };
+
+            return View(model);
         }
 
         private static MemoryStream GetAsciiArtStream(AsciiImageCoverterService asciiService, Bitmap bitmap)

@@ -22,7 +22,7 @@
         @{
             foreach (var blobName in blobNames)
             {
-                <tr><td>@blobName</td></tr>
+                <tr><td>@Html.ActionLink(blobName, "ConvertedImage", new { name = blobName })</td></tr>
             }
         }
         <tr></tr>
