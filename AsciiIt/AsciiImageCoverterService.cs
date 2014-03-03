@@ -81,26 +81,52 @@ namespace AsciiIt
             return img;
         }
 
-        private static int[,] GenerateGrayscaleMatrix(Bitmap image, out int maxGray, out int minGray)
+        private static int[,] GenerateGrayscaleMatrix(Bitmap image, out int maxGray, out int minGray, int outputWidth = 80)
         {
             maxGray = int.MinValue;
             minGray = int.MaxValue;
 
-            var grayscaleMatrix = new int[(image.Width), (image.Height)];
+            int outputHeight = (int)((decimal)outputWidth/((decimal)image.Width/((decimal)image.Height)));
 
-            for (int n = 0; n < image.Height; n++)
+            System.Diagnostics.Debug.WriteLine("Original dimensions {0}x{1}", new object[] { image.Width, image.Height });
+            System.Diagnostics.Debug.WriteLine("Scaled dimensions {0}x{1}", new object[] { outputWidth, outputHeight });
+
+            var grayscaleMatrix = new int[outputWidth, outputHeight];
+
+            decimal horizontalStep = image.Width/outputWidth;
+            decimal verticalStep = horizontalStep;
+
+            var averageGrayscalePerBlock = new List<int>();
+            int currentPixelGrayscale = 0;
+
+            for (int y = 0; y < outputHeight; y++)
             {
-                for (int i = 0; i < image.Width; i++)
+                for (int x = 0; x < outputWidth; x++)
                 {
-                    var pixel = image.GetPixel(i, n);
-                    var currentPixelGrayscale = (int)((pixel.R * .3) + (pixel.G * .59) + (pixel.B * .11));
+                    averageGrayscalePerBlock.Clear();
 
+                    // Average the block of pixels
+                    for (int n = (int)((decimal)y * verticalStep); n < Math.Min((int)((decimal)(y + 1) * verticalStep), image.Height); n++)
+                    {
+                        for (int i = (int)((decimal)x * horizontalStep); i < Math.Min((int)((decimal)(x + 1) * horizontalStep), image.Width); i++)
+                        {
+                            System.Diagnostics.Debug.WriteLine("x,y = {0},{1}; i,n = {2},{3}", new object[] { x, y, i, n } );
+                            var pixel = image.GetPixel(i, n);
+                            averageGrayscalePerBlock.Add((int)((pixel.R * .3) + (pixel.G * .59) + (pixel.B * .11)));
+                        }
+                    }
+                    if (averageGrayscalePerBlock.Count == 0)
+                        continue;
+
+                    currentPixelGrayscale = (int)averageGrayscalePerBlock.Average();
+                    grayscaleMatrix[x, y] = currentPixelGrayscale;
                     if (currentPixelGrayscale > maxGray) maxGray = currentPixelGrayscale;
                     if (currentPixelGrayscale < minGray) minGray = currentPixelGrayscale;
+                    averageGrayscalePerBlock.Clear();
 
-                    grayscaleMatrix[i, n] = currentPixelGrayscale;
                 }
             }
+
             return grayscaleMatrix;
         }
 
@@ -113,9 +139,9 @@ namespace AsciiIt
             var normalizedGrayscales = GenerateGrayscaleMap();
 
             var sb = new StringBuilder(256);
-            for (int j = 0; j < (image.Height); j++)
+            for (int j = 0; j < (grayscaleMatrix.GetLength(1)); j++)
             {
-                for (int i = 0; i < image.Width; i++)
+                for (int i = 0; i < grayscaleMatrix.GetLength(0); i++)
                 {
                     var normalizedValue = 1 + (grayscaleMatrix[i, j] - minGray) * 255 / (maxGray - minGray);
                     var replaceCharacter = normalizedGrayscales.First(pair => pair.Key >= normalizedValue).Value;
