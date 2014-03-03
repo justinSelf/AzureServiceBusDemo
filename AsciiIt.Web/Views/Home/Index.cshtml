@@ -1,14 +1,26 @@
-﻿@{
+﻿@model string
+@{
     ViewBag.Title = "Home Page";
 }
 
 <div class="jumbotron">
-    <h2>Make It Ascii!</h2>
+    @{
+        if (!string.IsNullOrEmpty(Model))
+        {
+            <h2>@Model</h2>
+
+        }
+        else
+        {
+            <h2>Make It Ascii!</h2>
+        }
+    }
 </div>
 <div class="row">
     <div class="col-md-12">
         <form role="form" method="POST" enctype="multipart/form-data">
             <div class="form-group">
+                <h4>Checkout the @Html.ActionLink("Gallery", "Gallery") or...</h4>
                 <label for="image">Upload a picture</label>
                 <input type="file" value="" name="image" id="image" />
                 <p class="help-block">Keep it under 4 megs... and pictures only, homie.</p>

@@ -6,34 +6,77 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using AsciiIt.Web.Models;
 using AsciiIt.Web.Services;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace AsciiIt.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        private const string CONVERTED_CONTAINER = "converted-images";
+
+        public ActionResult Index(string message = "")
         {
-            return View();
+            return View((object)message);
         }
 
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase image)
         {
-            if (image == null) return Index();
+            if (image == null) return Index("Where's the beef?");
             var imageStreamConverter = new ImageStreamConverter();
             var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
 
-            if (bitmap == null) return Index();
+            if (bitmap == null) return Index("That's not an image, homie...");
+
+            var container = GetBlobContainer(CONVERTED_CONTAINER);
+
+            var blob = container.GetBlockBlobReference(image.FileName);
+            if (blob.Exists())
+            {
+                return View((object)"An image with this name already exists in the gallery. Please choose a unique name");
+            }
 
             var asciiService = new AsciiImageCoverterService();
 
             var stream = GetAsciiArtStream(asciiService, bitmap);
-            var headerValue = string.Format("attachment; filename={0}_converted.txt", image.FileName);
 
-            Response.AddHeader("Content-Disposition", headerValue);
+            blob.UploadFromStream(stream);
 
-            return new FileStreamResult(stream, "application/text");
+            return Index();
+        }
+
+        public ActionResult Gallery()
+        {
+            var container = GetBlobContainer(CONVERTED_CONTAINER);
+            var convertedImageBlobs = container.ListBlobs();
+
+            return View(convertedImageBlobs);
+        }
+
+        private static CloudBlobContainer GetBlobContainer(string containerName)
+        {
+            var blobConnectionString = CloudConfigurationManager.GetSetting("BlobStorage.ConnectionString");
+
+            var storageAccount = CloudStorageAccount.Parse(blobConnectionString);
+            var blobClient = storageAccount.CreateCloudBlobClient();
+            var container = blobClient.GetContainerReference(containerName);
+            return container;
+        }
+
+        public ActionResult ConvertedImage(string name)
+        {
+            var container = GetBlobContainer(CONVERTED_CONTAINER);
+
+            var blob = container.GetBlockBlobReference(name);
+            var asciiImage = blob.DownloadText();
+
+            var model = new AsciiImage { ImageText = asciiImage, Name = name };
+
+            return View(model);
         }
 
         private static MemoryStream GetAsciiArtStream(AsciiImageCoverterService asciiService, Bitmap bitmap)
