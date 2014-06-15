@@ -26,7 +26,8 @@ namespace AsciiIt.Web.Controllers
         [HttpPost]
         public ActionResult Index(HttpPostedFileBase image)
         {
-            if (image == null) return Index("Where's the beef?");
+            if (image == null) return Index("Looks like you forgot to pick an image.");
+
             var imageStreamConverter = new ImageStreamConverter();
             var bitmap = imageStreamConverter.GetBitmapFromPostedFile(image);
 
@@ -37,7 +38,7 @@ namespace AsciiIt.Web.Controllers
             var blob = container.GetBlockBlobReference(image.FileName);
             if (blob.Exists())
             {
-                return View((object)"An image with this name already exists in the gallery. Please choose a unique name");
+                return View((object)"An image with this name already exists in the gallery. Make sure the image has a unique name");
             }
 
             var asciiService = new AsciiImageCoverterService();
