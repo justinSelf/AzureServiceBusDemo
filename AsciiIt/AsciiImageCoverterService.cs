@@ -86,19 +86,40 @@ namespace AsciiIt
             maxGray = int.MinValue;
             minGray = int.MaxValue;
 
-            var grayscaleMatrix = new int[(image.Width), (image.Height)];
 
-            for (int n = 0; n < image.Height; n++)
+            const int MAX_WIDTH = 300;
+
+            int blockWidth = image.Width / MAX_WIDTH;
+
+            if (blockWidth < 1) blockWidth = 1;
+
+            int blockHeight = (blockWidth * 2);
+
+            var grayscaleMatrix = new int[(image.Width / blockWidth), (image.Height / blockHeight)];
+
+            var currentBlock = new List<int>();
+            for (int n = 0; n < grayscaleMatrix.GetLength(1); n++)
             {
-                for (int i = 0; i < image.Width; i++)
+                for (int i = 0; i < grayscaleMatrix.GetLength(0); i++)
                 {
-                    var pixel = image.GetPixel(i, n);
-                    var currentPixelGrayscale = (int)((pixel.R * .3) + (pixel.G * .59) + (pixel.B * .11));
+                    for (int j = 0; j < blockHeight; j++)
+                    {
+                        for (int k = 0; k < blockWidth; k++)
+                        {
+                            var pixel = image.GetPixel((i * blockWidth) + k, (n * blockHeight) + j);
+                            var currentPixelGrayscale = (int)((pixel.R * .3) + (pixel.G * .59) + (pixel.B * .11));
 
-                    if (currentPixelGrayscale > maxGray) maxGray = currentPixelGrayscale;
-                    if (currentPixelGrayscale < minGray) minGray = currentPixelGrayscale;
+                            currentBlock.Add(currentPixelGrayscale);
+                        }
+                    }
 
-                    grayscaleMatrix[i, n] = currentPixelGrayscale;
+                    var averageGrayscale = currentBlock.Aggregate((memo, currentValue) => memo + currentValue) / currentBlock.Count;
+                    currentBlock.Clear();
+                    if (averageGrayscale > maxGray) maxGray = averageGrayscale;
+                    if (averageGrayscale < minGray) minGray = averageGrayscale;
+
+                    grayscaleMatrix[i, n] = averageGrayscale;
+
                 }
             }
             return grayscaleMatrix;
@@ -113,9 +134,9 @@ namespace AsciiIt
             var normalizedGrayscales = GenerateGrayscaleMap();
 
             var sb = new StringBuilder(256);
-            for (int j = 0; j < (image.Height); j++)
+            for (int j = 0; j < (grayscaleMatrix.GetLength(1)); j++)
             {
-                for (int i = 0; i < image.Width; i++)
+                for (int i = 0; i < grayscaleMatrix.GetLength(0); i++)
                 {
                     var normalizedValue = 1 + (grayscaleMatrix[i, j] - minGray) * 255 / (maxGray - minGray);
                     var replaceCharacter = normalizedGrayscales.First(pair => pair.Key >= normalizedValue).Value;

@@ -36,10 +36,10 @@ namespace AsciiIt.Web.Controllers
             var container = GetBlobContainer(CONVERTED_CONTAINER);
 
             var blob = container.GetBlockBlobReference(image.FileName);
-            if (blob.Exists())
-            {
-                return View((object)"An image with this name already exists in the gallery. Make sure the image has a unique name");
-            }
+            //if (blob.Exists())
+            //{
+            //    return View((object)"An image with this name already exists in the gallery. Make sure the image has a unique name");
+            //}
 
             var asciiService = new AsciiImageCoverterService();
 
